@@ -427,6 +427,24 @@ class _IntlPhoneFieldState extends State<IntlPhoneField> {
         widget.onChanged?.call(phoneNumber);
       },
       validator: (value) {
+        if (widget.autovalidateMode == AutovalidateMode.disabled) {
+          final phoneNumber = PhoneNumber(
+            countryISOCode: _selectedCountry.code,
+            countryCode: '+${_selectedCountry.fullCountryCode}',
+            number: value ?? '',
+          );
+
+          final validatorValue = widget.validator?.call(phoneNumber);
+
+          if (validatorValue == null) {
+            validatorMessage = null;
+          } else if (validatorValue is String) {
+            validatorMessage = validatorValue;
+          } else {
+            //no support for Future
+          }
+        }
+
         if (value == null || !isNumeric(value)) return validatorMessage;
         if (!widget.disableLengthCheck) {
           return value.length >= _selectedCountry.minLength && value.length <= _selectedCountry.maxLength
